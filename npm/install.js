@@ -6,7 +6,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const NAME = 'rmsg';
-const VERSION = '0.1.6';
+const VERSION = '0.1.7';
 const REPO = 'hgwk/rmsg';
 const BIN_DIR = path.join(os.homedir(), '.rmsg', 'bin');
 const BIN_PATH = path.join(BIN_DIR, NAME + (os.platform() === 'win32' ? '.exe' : ''));
