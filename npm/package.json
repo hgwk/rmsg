@@ -2,7 +2,9 @@
   "name": "@hgwk/rmsg",
   "version": "0.1.7",
   "description": "Serverless P2P encrypted chat — libp2p + E2E encryption, zero servers",
-  "bin": "./install.js",
+  "bin": {
+    "rmsg": "./install.js"
+  },
   "scripts": {
     "postinstall": "node install.js --install"
   },
