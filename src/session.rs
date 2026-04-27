@@ -113,13 +113,13 @@ impl ChatSession {
         Ok(serde_json::to_string(&WireMessage::Chat(ChatMessage {
             id, from: self.user_id.clone(),
             ct: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &enc.ct),
-            nonce: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &enc.nonce),
+            nonce: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, enc.nonce),
             seq: self.seq, ts: chrono_now(), sid: Some(self.user_id.clone()),
         })).expect("json encode chat message"))
     }
 
     pub fn mk_handshake(&self) -> String {
-        let pk_b64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &self.kp.pk);
+        let pk_b64 = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, self.kp.pk);
         serde_json::to_string(&WireMessage::Control(ControlMessage::PublicKey {
             from: self.user_id.clone(), pk: pk_b64, sid: self.user_id.clone(),
         })).expect("json encode handshake")
@@ -136,7 +136,7 @@ impl ChatSession {
             items.push(HistoryItem {
                 id: m.id.clone(), from: m.from_id.clone(),
                 ct: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &enc.0),
-                nonce: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &enc.1),
+                nonce: base64::Engine::encode(&base64::engine::general_purpose::STANDARD, enc.1),
                 seq: self.seq, ts: m.ts,
             });
         }

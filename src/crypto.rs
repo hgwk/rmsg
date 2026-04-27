@@ -41,7 +41,7 @@ impl KeyPair {
             }
         }
         let kp = Self::generate();
-        std::fs::write(path, &kp.sk.to_bytes())?;
+        std::fs::write(path, kp.sk.to_bytes())?;
         Ok(kp)
     }
 }

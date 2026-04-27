@@ -226,14 +226,14 @@ impl RelayApp {
                 } else if msg.mine {
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Max), |ui| {
                         ui.horizontal(|ui| {
-                            ui.label(egui::RichText::new(&format_time(msg.ts)).color(egui::Color32::DARK_GRAY).size(10.0));
+                            ui.label(egui::RichText::new(format_time(msg.ts)).color(egui::Color32::DARK_GRAY).size(10.0));
                             ui.colored_label(egui::Color32::from_rgb(0, 120, 255), &msg.text);
                         });
                     });
                 } else {
                     ui.horizontal(|ui| {
                         ui.colored_label(egui::Color32::from_rgb(60, 60, 60), &msg.text);
-                        ui.label(egui::RichText::new(&format_time(msg.ts)).color(egui::Color32::DARK_GRAY).size(10.0));
+                        ui.label(egui::RichText::new(format_time(msg.ts)).color(egui::Color32::DARK_GRAY).size(10.0));
                     });
                 }
                 ui.add_space(2.0);
