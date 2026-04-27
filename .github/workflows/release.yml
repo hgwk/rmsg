@@ -39,7 +39,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: rmsg-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/rmsg-v${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+          path: target/${{ matrix.target }}/release/rmsg-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+          if-no-files-found: error
 
   release:
     needs: build
@@ -64,4 +65,12 @@ jobs:
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
-      - run: cd npm && npm publish --access public --provenance
+      - name: Publish npm package
+        run: |
+          cd npm
+          VERSION="$(node -p "require('./package.json').version")"
+          if npm view "@hgwk/rmsg@${VERSION}" version >/dev/null 2>&1; then
+            echo "@hgwk/rmsg@${VERSION} already exists; skipping npm publish."
+            exit 0
+          fi
+          npm publish --access public --provenance
