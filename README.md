@@ -12,30 +12,25 @@ All messages are stored only on your device (SQLite). Nothing touches a server i
 
 ## Install
 
-### Homebrew (macOS/Linux)
-
-```bash
-brew install hgwk/tap/rmsg
-```
-
-### Cargo
-
-```bash
-cargo install rmsg
-```
-
-### npm (like cduo)
-
-```bash
-npm install -g @hgwk/rmsg
-```
-
 ### From source
 
 ```bash
 git clone https://github.com/hgwk/rmsg.git
 cd rmsg
 cargo build --release
+```
+
+### Coming soon
+
+```bash
+# npm (like cduo)
+npm install -g @hgwk/rmsg
+
+# Cargo
+cargo install rmsg
+
+# Homebrew
+brew install hgwk/tap/rmsg
 ```
 
 ## Quick Start

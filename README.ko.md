@@ -12,30 +12,25 @@
 
 ## 설치
 
-### Homebrew (macOS/Linux)
-
-```bash
-brew install hgwk/tap/rmsg
-```
-
-### Cargo
-
-```bash
-cargo install rmsg
-```
-
-### npm (cduo 방식)
-
-```bash
-npm install -g @hgwk/rmsg
-```
-
 ### 소스에서 빌드
 
 ```bash
 git clone https://github.com/hgwk/rmsg.git
 cd rmsg
 cargo build --release
+```
+
+### 출시 예정
+
+```bash
+# npm (cduo 방식)
+npm install -g @hgwk/rmsg
+
+# Cargo
+cargo install rmsg
+
+# Homebrew
+brew install hgwk/tap/rmsg
 ```
 
 ## 빠른 시작
