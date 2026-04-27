@@ -24,6 +24,7 @@ pub enum Command {
     Create,
     Join { room_id: String },
     List,
+    Discover,
     Tui,
 }
 
@@ -48,6 +49,7 @@ pub fn run_cli(cli: Cli, store: Arc<MessageStore>, kp: Arc<KeyPair>) {
                 Err(e) => eprintln!("Error: {}", e),
             }
         }
+        Command::Discover => run_discover(store, cli.name, kp),
         Command::Tui => {
             crate::tui::run_tui(store, kp, cli.name);
         }
@@ -137,4 +139,46 @@ fn run_chat(room_id: String, store: Arc<MessageStore>, name: String, kp: Arc<Key
 
         std::thread::sleep(std::time::Duration::from_millis(100));
     }
+}
+
+fn run_discover(store: Arc<MessageStore>, name: String, kp: Arc<KeyPair>) {
+    let rt = tokio::runtime::Runtime::new().expect("tokio runtime");
+    let (event_tx, mut event_rx) = mpsc::unbounded_channel();
+
+    std::thread::spawn(move || {
+        rt.block_on(async {
+            let mut node = match P2PNode::new(event_tx) { Ok(n) => n, Err(e) => { eprintln!("P2P: {}", e); return; } };
+            node.discover_rooms();
+            loop {
+                tokio::select! {
+                    _ = node.run() => {},
+                }
+            }
+        });
+    });
+
+    println!("Discovering rooms... (waiting for peers)");
+
+    let start = std::time::Instant::now();
+    loop {
+        if start.elapsed() > std::time::Duration::from_secs(15) {
+            println!("No rooms found. Try creating one with: rmsg create");
+            break;
+        }
+        while let Ok(event) = event_rx.try_recv() {
+            if let P2PEvent::RoomsDiscovered(rooms) = event {
+                if rooms.is_empty() {
+                    println!("No rooms on the network yet.");
+                } else {
+                    println!("Rooms on the network:");
+                    for r in &rooms {
+                        println!("  {}  (join: rmsg join {})", r, r);
+                    }
+                }
+                return;
+            }
+    }
+        std::thread::sleep(std::time::Duration::from_millis(200));
+    }
+    let _ = (store, name, kp);
 }

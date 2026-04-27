@@ -36,6 +36,7 @@ pub struct RelayApp {
     pending_clipboard: Option<String>,
     join_input: String,
     fonts_loaded: bool,
+    available_rooms: Vec<String>,
 }
 
 enum P2PCmd { JoinRoom(String), Send(String, Vec<u8>) }
@@ -62,7 +63,7 @@ impl RelayApp {
             p2p_events: event_rx, p2p_cmd: cmd_tx, session: None, messages: Vec::new(), input: String::new(),
             peers: HashSet::new(), send_hs: false, peer_typing: false, last_typing_sent: std::time::Instant::now(),
             room_alias: String::new(), connection_status: String::new(), room_alias_input: String::new(),
-            pending_clipboard: None, join_input: String::new(), fonts_loaded: false }
+            pending_clipboard: None, join_input: String::new(), fonts_loaded: false, available_rooms: vec![] }
     }
 }
 
@@ -113,6 +114,7 @@ impl RelayApp {
                 }
             },
             P2PEvent::PeerDiscovered(peer) => { self.peers.insert(peer.to_string()); self.connection_status = format!("Connected ({} peer{})", self.peers.len(), if self.peers.len() == 1 { "" } else { "s" }); }
+            P2PEvent::RoomsDiscovered(rooms) => { self.available_rooms = rooms; }
             P2PEvent::Error(e) => { self.error = e; }
         }}
     }

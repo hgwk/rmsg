@@ -16,10 +16,13 @@ const BOOTSTRAP_NODES: &[&str] = &[
     "/dnsaddr/bootstrap.libp2p.io/p2p/QmcZf59bWwK5XFi76CZX8cbJ4BhTzzA3gU1ZjYZcYW3dwt",
 ];
 
+const ROOMS_DHT_KEY: &str = "rmsg-active-rooms";
+
 pub enum P2PEvent {
     Message { data: Vec<u8> },
     PeerDiscovered(PeerId),
     Subscribed,
+    RoomsDiscovered(Vec<String>),
     #[allow(dead_code)]
     Error(String),
 }
@@ -109,7 +112,57 @@ identify::Config::new("rmsg/0.1.0".into(), local_key.public())
         self.rooms.insert(room_id.to_string());
         let topic = gossipsub::IdentTopic::new(format!("rmsg-room-{}", room_id));
         self.swarm.behaviour_mut().gossipsub.subscribe(&topic)?;
+        self.advertise_room();
         Ok(())
+    }
+
+    fn advertise_room(&mut self) {
+        let key = kad::RecordKey::new(&ROOMS_DHT_KEY);
+        self.swarm.behaviour_mut().kademlia.get_record(key);
+    }
+
+    pub fn discover_rooms(&mut self) {
+        let key = kad::RecordKey::new(&ROOMS_DHT_KEY);
+        self.swarm.behaviour_mut().kademlia.get_record(key);
+    }
+
+    fn write_rooms_record(&mut self) {
+        let key = kad::RecordKey::new(&ROOMS_DHT_KEY);
+        let rooms_json = serde_json::to_string(&self.rooms.iter().collect::<Vec<_>>()).unwrap_or_default();
+        let record = kad::Record::new(key, rooms_json.into_bytes());
+        if let Err(e) = self.swarm.behaviour_mut().kademlia.put_record(record, kad::Quorum::One) {
+            log::warn!("Failed to put rooms record: {:?}", e);
+        }
+    }
+
+    fn handle_kad_get(&mut self, key: kad::RecordKey, result: Result<Option<Vec<u8>>, kad::GetRecordError>) {
+        if key.as_ref() != ROOMS_DHT_KEY.as_bytes() {
+            return;
+        }
+        match result {
+            Ok(Some(data)) => {
+                let mut rooms: Vec<String> = serde_json::from_slice::<Vec<&str>>(&data)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(String::from)
+                    .collect();
+                for r in &self.rooms {
+                    if !rooms.contains(r) {
+                        rooms.push(r.clone());
+                    }
+                }
+                self.write_rooms_record();
+                let _ = self.event_tx.send(P2PEvent::RoomsDiscovered(rooms));
+            }
+            Ok(None) | Err(kad::GetRecordError::NotFound { .. }) => {
+                self.write_rooms_record();
+                let rooms: Vec<String> = self.rooms.iter().cloned().collect();
+                let _ = self.event_tx.send(P2PEvent::RoomsDiscovered(rooms));
+            }
+            Err(e) => {
+                log::warn!("Failed to get rooms record: {:?}", e);
+            }
+        }
     }
 
     pub fn send_message(&mut self, room_id: &str, data: Vec<u8>) -> Result<(), Box<dyn std::error::Error>> {
@@ -138,6 +191,17 @@ identify::Config::new("rmsg/0.1.0".into(), local_key.public())
                 )) => {
                     self.topic_peers.insert(peer_id);
                     let _ = self.event_tx.send(P2PEvent::Subscribed);
+                }
+                SwarmEvent::Behaviour(RelayBehaviourEvent::Kademlia(
+                    kad::Event::OutboundQueryProgressed { result: kad::QueryResult::GetRecord(Ok(kad::GetRecordOk::FoundRecord(peer_record))), .. }
+                )) => {
+                    self.handle_kad_get(peer_record.record.key, Ok(Some(peer_record.record.value)));
+                }
+                SwarmEvent::Behaviour(RelayBehaviourEvent::Kademlia(
+                    kad::Event::OutboundQueryProgressed { result: kad::QueryResult::GetRecord(Err(e)), .. }
+                )) => {
+                    let key = kad::RecordKey::new(&ROOMS_DHT_KEY);
+                    self.handle_kad_get(key, Err(e));
                 }
                 SwarmEvent::Behaviour(RelayBehaviourEvent::Identify(
                     identify::Event::Received { peer_id, info, .. }

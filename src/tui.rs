@@ -97,6 +97,13 @@ pub fn run_tui(store: Arc<MessageStore>, kp: Arc<KeyPair>, name: String) {
                         let _ = cmd_tx.send(TuiCmd::Send(session.room_id().into(), ws.into_bytes()));
                     }
                 }
+                P2PEvent::RoomsDiscovered(rooms) => {
+                    for r in rooms {
+                        if !state.rooms.contains(&r) {
+                            state.rooms.push(r);
+                        }
+                    }
+                }
                 _ => {}
             }
         }
