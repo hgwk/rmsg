@@ -151,7 +151,7 @@ mod tests {
         alice_sess.start(&alice.sk, &bob.pk).unwrap();
         bob_sess.start(&bob.sk, &alice.pk).unwrap();
 
-        let plain = b"hello relay!";
+        let plain = b"hello rmsg!";
         let enc = alice_sess.encrypt(plain, 1).unwrap();
         let dec = bob_sess.decrypt(&enc.ct, &enc.nonce, 1).unwrap();
         assert_eq!(dec, plain);
@@ -176,7 +176,7 @@ mod tests {
 
     #[test]
     fn test_keypair_persistence() {
-        let tmp = std::env::temp_dir().join("relay-test-key");
+        let tmp = std::env::temp_dir().join("rmsg-test-key");
         let kp1 = KeyPair::load_or_generate(&tmp).unwrap();
         let kp2 = KeyPair::load_or_generate(&tmp).unwrap();
         assert_eq!(kp1.pk, kp2.pk);

@@ -70,8 +70,8 @@ impl P2PNode {
         );
 
         let identify = identify::Behaviour::new(
-            identify::Config::new("relay/0.2.0".into(), local_key.public())
-                .with_agent_version("relay-p2p/0.2.0".into()),
+identify::Config::new("rmsg/0.1.0".into(), local_key.public())
+.with_agent_version("rmsg-p2p/0.1.0".into()),
         );
 
         let ping = ping::Behaviour::new(ping::Config::default()
@@ -107,13 +107,13 @@ impl P2PNode {
 
     pub fn join_room(&mut self, room_id: &str) -> Result<(), Box<dyn std::error::Error>> {
         self.rooms.insert(room_id.to_string());
-        let topic = gossipsub::IdentTopic::new(format!("relay-room-{}", room_id));
+        let topic = gossipsub::IdentTopic::new(format!("rmsg-room-{}", room_id));
         self.swarm.behaviour_mut().gossipsub.subscribe(&topic)?;
         Ok(())
     }
 
     pub fn send_message(&mut self, room_id: &str, data: Vec<u8>) -> Result<(), Box<dyn std::error::Error>> {
-        let topic = gossipsub::IdentTopic::new(format!("relay-room-{}", room_id));
+        let topic = gossipsub::IdentTopic::new(format!("rmsg-room-{}", room_id));
         self.swarm.behaviour_mut().gossipsub.publish(topic, data)?;
         Ok(())
     }

@@ -120,7 +120,7 @@ impl RelayApp {
     fn show_lobby(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             ui.add_space(20.0);
-            ui.heading(egui::RichText::new("● relay").size(28.0));
+            ui.heading(egui::RichText::new("● rmsg").size(28.0));
             ui.add_space(4.0);
             ui.label(egui::RichText::new("No signup. No phone. No server.").color(egui::Color32::GRAY));
             ui.add_space(2.0);

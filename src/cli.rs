@@ -11,7 +11,7 @@ use crate::session::ChatSession;
 use crate::storage::MessageStore;
 
 #[derive(Parser)]
-#[command(name = "relay", version, about = "Serverless P2P encrypted chat")]
+#[command(name = "rmsg", version, about = "Serverless P2P encrypted chat")]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Option<Command>,

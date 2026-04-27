@@ -42,7 +42,7 @@ fn main() -> Result<(), eframe::Error> {
     };
 
     eframe::run_native(
-        "relay — serverless P2P chat",
+        "rmsg — serverless P2P chat",
         options,
         Box::new(|_cc| Ok(Box::new(RelayApp::new(store, kp)))),
     )

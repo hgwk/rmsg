@@ -253,7 +253,7 @@ fn draw_lobby(f: &mut ratatui::Frame, area: Rect, state: &TuiState) {
     f.render_widget(room_list, chunks[0]);
 
     let help = Paragraph::new(vec![
-        Line::from(Span::styled("● relay", Style::default().fg(Color::Cyan))),
+        Line::from(Span::styled("● rmsg", Style::default().fg(Color::Cyan))),
         Line::from(""),
         Line::from("n  new room"),
         Line::from("j/k  navigate"),
