@@ -38,15 +38,35 @@ brew install hgwk/tap/rmsg
 ### CLI mode
 
 ```bash
-# Create a room
-rmsg create
-# → Room created: room-a1b2c3d4
+# Create a room and print an invite URI
+rmsg invite create
+# → Invite: rmsg://v1/...
 
 # On another machine, join
-rmsg join room-a1b2c3d4
+rmsg join 'rmsg://v1/...'
 
 # Type messages. /quit to exit.
 ```
+
+### Internet / NAT traversal
+
+Any reachable user PC can act as a libp2p circuit relay:
+
+```bash
+rmsg relay --listen /ip4/0.0.0.0/tcp/4001
+# Share the printed /p2p address.
+```
+
+Private peers can create or join rooms through that relay:
+
+```bash
+rmsg --relay /ip4/<host>/tcp/4001/p2p/<relay-peer-id> invite create
+rmsg --relay /ip4/<host>/tcp/4001/p2p/<relay-peer-id> join 'rmsg://v1/...'
+```
+
+Each `rmsg` node also runs a relay server, exchanges known peer addresses, attempts direct dials,
+reserves relay circuits on known relay-capable peers, and rebroadcasts encrypted mesh envelopes
+with TTL-based loop prevention.
 
 ### GUI mode
 
@@ -62,14 +82,25 @@ rmsg
 rmsg tui
 ```
 
+The TUI opens a menu-driven lobby:
+
+- `1` create an invite room
+- `2` join a room ID or `rmsg://v1/...` invite
+- `3` add a relay or peer multiaddr
+- `4` open the selected local room
+
+Inside a room, the left pane shows the current invite URI. Share that URI with another peer.
+
 ## Commands
 
 | Command | Description |
 |---------|-------------|
 | `rmsg` | Launch GUI |
 | `rmsg tui` | Launch TUI (ratatui) |
-| `rmsg create` | Create a new room and start chatting |
-| `rmsg join <room-id>` | Join an existing room |
+| `rmsg create` | Create a new room, print an invite URI, and start chatting |
+| `rmsg invite create` | Create a new room and print an invite URI |
+| `rmsg join <room-id-or-invite>` | Join an existing room |
+| `rmsg relay --listen <multiaddr>` | Run a reachable relay node |
 | `rmsg list` | List known rooms from local database |
 | `rmsg --help` | Show help |
 

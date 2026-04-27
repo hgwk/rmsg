@@ -1,15 +1,15 @@
-mod crypto;
-mod storage;
-mod protocol;
-mod p2p;
-mod session;
 mod app;
 mod cli;
+mod crypto;
+mod p2p;
+mod protocol;
+mod session;
+mod storage;
 mod tui;
 
+use clap::Parser;
 use std::path::PathBuf;
 use std::sync::Arc;
-use clap::Parser;
 
 use app::RelayApp;
 use cli::Cli;
@@ -36,8 +36,7 @@ fn main() -> Result<(), eframe::Error> {
     }
 
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([800.0, 600.0]),
+        viewport: egui::ViewportBuilder::default().with_inner_size([800.0, 600.0]),
         ..Default::default()
     };
 

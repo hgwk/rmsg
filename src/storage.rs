@@ -26,9 +26,11 @@ impl MessageStore {
                 text TEXT NOT NULL,
                 ts INTEGER NOT NULL
             );
-            CREATE INDEX IF NOT EXISTS idx_room_ts ON messages(room_id, ts);"
+            CREATE INDEX IF NOT EXISTS idx_room_ts ON messages(room_id, ts);",
         )?;
-        Ok(Self { conn: Mutex::new(conn) })
+        Ok(Self {
+            conn: Mutex::new(conn),
+        })
     }
 
     pub fn save(&self, msg: &StoredMessage) -> SqlResult<()> {
@@ -44,7 +46,7 @@ impl MessageStore {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
             "SELECT id, room_id, from_id, text, ts FROM messages
-             WHERE room_id = ?1 ORDER BY ts DESC LIMIT ?2"
+             WHERE room_id = ?1 ORDER BY ts DESC LIMIT ?2",
         )?;
         let rows = stmt.query_map(params![room_id, limit as i64], |row| {
             Ok(StoredMessage {
@@ -61,11 +63,16 @@ impl MessageStore {
     }
 
     #[allow(dead_code)]
-    pub fn load_before(&self, room_id: &str, before_ts: i64, limit: usize) -> SqlResult<Vec<StoredMessage>> {
+    pub fn load_before(
+        &self,
+        room_id: &str,
+        before_ts: i64,
+        limit: usize,
+    ) -> SqlResult<Vec<StoredMessage>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
             "SELECT id, room_id, from_id, text, ts FROM messages
-             WHERE room_id = ?1 AND ts < ?2 ORDER BY ts DESC LIMIT ?3"
+             WHERE room_id = ?1 AND ts < ?2 ORDER BY ts DESC LIMIT ?3",
         )?;
         let rows = stmt.query_map(params![room_id, before_ts, limit as i64], |row| {
             Ok(StoredMessage {
@@ -88,18 +95,15 @@ impl MessageStore {
 
     pub fn list_rooms(&self) -> SqlResult<Vec<String>> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn.prepare(
-            "SELECT DISTINCT room_id FROM messages ORDER BY MAX(ts) DESC"
-        )?;
+        let mut stmt =
+            conn.prepare("SELECT DISTINCT room_id FROM messages ORDER BY MAX(ts) DESC")?;
         let rows = stmt.query_map([], |row| row.get(0))?;
         Ok(rows.filter_map(|r| r.ok()).collect())
     }
 
     pub fn last_ts(&self, room_id: &str) -> SqlResult<Option<i64>> {
         let conn = self.conn.lock().unwrap();
-        let mut stmt = conn.prepare(
-            "SELECT MAX(ts) FROM messages WHERE room_id = ?1"
-        )?;
+        let mut stmt = conn.prepare("SELECT MAX(ts) FROM messages WHERE room_id = ?1")?;
         stmt.query_row(params![room_id], |row| row.get(0))
     }
 }

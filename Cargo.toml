@@ -1,6 +1,6 @@
 [package]
 name = "rmsg"
-version = "0.1.0"
+version = "0.1.6"
 edition = "2021"
 authors = ["hgwk"]
 description = "Serverless P2P encrypted chat — libp2p DHT + E2E encryption, zero servers"

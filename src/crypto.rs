@@ -31,6 +31,12 @@ impl KeyPair {
         Self { pk, sk }
     }
 
+    pub fn short_id(&self) -> String {
+        use base64::Engine;
+
+        base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(&self.pk[..6])
+    }
+
     pub fn load_or_generate(path: &std::path::Path) -> Result<Self, std::io::Error> {
         if path.exists() {
             let bytes = std::fs::read(path)?;
@@ -53,10 +59,7 @@ pub struct CryptoSession {
 
 impl CryptoSession {
     pub fn new(room_id: String) -> Self {
-        Self {
-            aes: None,
-            room_id,
-        }
+        Self { aes: None, room_id }
     }
 
     pub fn start(&mut self, my_sk: &StaticSecret, peer_pk: &[u8; 32]) -> Result<(), CryptoError> {
@@ -69,8 +72,7 @@ impl CryptoSession {
         hkdf.expand(info, &mut okm)
             .map_err(|_| CryptoError::KeyDerivation)?;
 
-        let aes = Aes256Gcm::new_from_slice(&okm)
-            .map_err(|_| CryptoError::KeyDerivation)?;
+        let aes = Aes256Gcm::new_from_slice(&okm).map_err(|_| CryptoError::KeyDerivation)?;
         self.aes = Some(aes);
         Ok(())
     }
@@ -85,10 +87,13 @@ impl CryptoSession {
 
         let aad = format!("{}:{}", self.room_id, seq);
         let payload = aes
-            .encrypt(nonce, aes_gcm::aead::Payload {
-                msg: plain,
-                aad: aad.as_bytes(),
-            })
+            .encrypt(
+                nonce,
+                aes_gcm::aead::Payload {
+                    msg: plain,
+                    aad: aad.as_bytes(),
+                },
+            )
             .map_err(|_| CryptoError::Encryption)?;
 
         Ok(Encrypted {
@@ -97,16 +102,24 @@ impl CryptoSession {
         })
     }
 
-    pub fn decrypt(&self, ct: &[u8], nonce: &[u8; NONCE_SIZE], seq: u64) -> Result<Vec<u8>, CryptoError> {
+    pub fn decrypt(
+        &self,
+        ct: &[u8],
+        nonce: &[u8; NONCE_SIZE],
+        seq: u64,
+    ) -> Result<Vec<u8>, CryptoError> {
         let aes = self.aes.as_ref().ok_or(CryptoError::NotReady)?;
 
         let nonce_slice = Nonce::from_slice(nonce);
         let aad = format!("{}:{}", self.room_id, seq);
         let plain = aes
-            .decrypt(nonce_slice, aes_gcm::aead::Payload {
-                msg: ct,
-                aad: aad.as_bytes(),
-            })
+            .decrypt(
+                nonce_slice,
+                aes_gcm::aead::Payload {
+                    msg: ct,
+                    aad: aad.as_bytes(),
+                },
+            )
             .map_err(|_| CryptoError::Decryption)?;
 
         Ok(plain)
