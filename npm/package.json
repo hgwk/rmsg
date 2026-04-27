@@ -1,16 +1,17 @@
 {
   "name": "@hgwk/rmsg",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Serverless P2P encrypted chat — libp2p + E2E encryption, zero servers",
-  "bin": {
-    "rmsg": "./install.js"
-  },
+  "bin": "./install.js",
   "scripts": {
     "postinstall": "node install.js --install"
   },
   "keywords": ["chat", "p2p", "libp2p", "e2e", "encrypted", "dht"],
   "license": "MIT",
-  "repository": "hgwk/rmsg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hgwk/rmsg.git"
+  },
   "files": ["install.js", "package.json", "README.md"],
   "engines": {
     "node": ">=16"
