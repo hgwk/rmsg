@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["hgwk"]
 description = "Serverless P2P encrypted chat — libp2p DHT + E2E encryption, zero servers"
 license = "MIT"
-repository = "https://github.com/hgwk/relay"
+repository = "https://github.com/hgwk/rmsg"
 keywords = ["chat", "p2p", "libp2p", "e2e", "encrypted", "dht"]
 categories = ["command-line-utilities", "network-programming"]
 
