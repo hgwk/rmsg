@@ -1,0 +1,60 @@
+[package]
+name = "relay"
+version = "0.1.0"
+edition = "2021"
+authors = ["hgwk"]
+description = "Serverless P2P encrypted chat — libp2p DHT + E2E encryption, zero servers"
+license = "MIT"
+repository = "https://github.com/hgwk/relay"
+keywords = ["chat", "p2p", "libp2p", "e2e", "encrypted", "dht"]
+categories = ["command-line-utilities", "network-programming"]
+
+[[bin]]
+name = "relay"
+path = "src/main.rs"
+
+[dependencies]
+# Crypto (match existing JS protocol exactly)
+x25519-dalek = { version = "2", features = ["static_secrets"] }
+hkdf = "0.12"
+sha2 = "0.10"
+aes-gcm = "0.10"
+rand = "0.8"
+
+# P2P (libp2p with Kademlia DHT + GossipSub)
+libp2p = { version = "0.54", features = ["full"] }
+futures = "0.3"
+
+# Storage
+rusqlite = { version = "0.32", features = ["bundled"] }
+
+# GUI
+eframe = "0.31"
+egui = "0.31"
+
+# TUI
+ratatui = "0.29"
+crossterm = "0.28"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Utilities
+clap = { version = "4", features = ["derive"] }
+base64 = "0.22"
+uuid = { version = "1", features = ["v4"] }
+tokio = { version = "1", features = ["full"] }
+thiserror = "2"
+log = "0.4"
+env_logger = "0.11"
+dirs = "5"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = "symbols"
+
+[profile.dev]
+opt-level = 0
