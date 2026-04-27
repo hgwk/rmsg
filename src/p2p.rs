@@ -118,11 +118,17 @@ identify::Config::new("rmsg/0.1.0".into(), local_key.public())
 
     fn advertise_room(&mut self) {
         let key = kad::RecordKey::new(&ROOMS_DHT_KEY);
-        self.swarm.behaviour_mut().kademlia.get_record(key);
+        let rooms_json = serde_json::to_string(&self.rooms.iter().collect::<Vec<_>>()).unwrap_or_default();
+        let record = kad::Record::new(key, rooms_json.into_bytes());
+        log::info!("Advertising {} rooms to DHT", self.rooms.len());
+        if let Err(e) = self.swarm.behaviour_mut().kademlia.put_record(record, kad::Quorum::One) {
+            log::warn!("Failed to advertise rooms: {:?}", e);
+        }
     }
 
     pub fn discover_rooms(&mut self) {
         let key = kad::RecordKey::new(&ROOMS_DHT_KEY);
+        log::info!("Discovering rooms from DHT");
         self.swarm.behaviour_mut().kademlia.get_record(key);
     }
 
@@ -208,6 +214,7 @@ identify::Config::new("rmsg/0.1.0".into(), local_key.public())
                 )) => {
                     for addr in &info.listen_addrs {
                         self.swarm.behaviour_mut().kademlia.add_address(&peer_id, addr.clone());
+                        let _ = self.swarm.dial(addr.clone());
                     }
                     let _ = self.event_tx.send(P2PEvent::PeerDiscovered(peer_id));
                 }

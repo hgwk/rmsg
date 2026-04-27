@@ -166,7 +166,13 @@ fn handle_key(state: &mut TuiState, key: event::KeyEvent, cmd: &mpsc::UnboundedS
                 }
             }
             KeyCode::Enter => {
-                if let Some(ref rid) = state.selected_room {
+                if !state.room_input.is_empty() {
+                    let rid = state.room_input.trim().to_string();
+                    if !rid.is_empty() {
+                        enter_room(state, &rid, cmd);
+                        state.room_input.clear();
+                    }
+                } else if let Some(ref rid) = state.selected_room {
                     let rid = rid.clone();
                     enter_room(state, &rid, cmd);
                 }
@@ -268,6 +274,8 @@ fn draw_lobby(f: &mut ratatui::Frame, area: Rect, state: &TuiState) {
         Line::from("q  quit"),
         Line::from(""),
         Line::from(format!("Peers: {}", state.peers)),
+        Line::from(""),
+        Line::from(format!("Join: {}", state.room_input)),
     ]).block(Block::default().borders(Borders::ALL).title("Info"));
     f.render_widget(help, chunks[1]);
 }
