@@ -1,12 +1,12 @@
 [English](README.md) | 한국어
 
-# relay
+# rmsg
 
 서버리스 P2P 암호화 채팅 — 서버 0, 로그 0, libp2p + Kademlia DHT 기반 E2E 암호화.
 
 ## 하는 일
 
-`relay`는 서버 없이 P2P로 채팅합니다. 모든 메시지는 E2E 암호화(X25519 + AES-256-GCM)되고 libp2p GossipSub로 전달됩니다. 피어 발견은 Kademlia DHT를 사용하며 중앙 서버, 가입, 전화번호가 전혀 필요하지 않습니다.
+`rmsg`는 서버 없이 P2P로 채팅합니다. 모든 메시지는 E2E 암호화(X25519 + AES-256-GCM)되고 libp2p GossipSub로 전달됩니다. 피어 발견은 Kademlia DHT를 사용하며 중앙 서버, 가입, 전화번호가 전혀 필요하지 않습니다.
 
 모든 메시지는 사용자 디바이스에만 저장됩니다(SQLite). 어떤 서버도 평문을 볼 수 없습니다.
 
@@ -15,26 +15,26 @@
 ### Homebrew (macOS/Linux)
 
 ```bash
-brew install hgwk/tap/relay
+brew install hgwk/tap/rmsg
 ```
 
 ### Cargo
 
 ```bash
-cargo install relay-chat
+cargo install rmsg
 ```
 
 ### npm (cduo 방식)
 
 ```bash
-npm install -g @hgwk/relay
+npm install -g @hgwk/rmsg
 ```
 
 ### 소스에서 빌드
 
 ```bash
-git clone https://github.com/hgwk/relay.git
-cd relay/relay-rs
+git clone https://github.com/hgwk/rmsg.git
+cd rmsg
 cargo build --release
 ```
 
@@ -44,11 +44,11 @@ cargo build --release
 
 ```bash
 # 방 만들기
-relay create
+rmsg create
 # → Room created: room-a1b2c3d4
 
 # 다른 기기에서 참여
-relay join room-a1b2c3d4
+rmsg join room-a1b2c3d4
 
 # 메시지 입력. /quit 으로 종료.
 ```
@@ -57,19 +57,26 @@ relay join room-a1b2c3d4
 
 ```bash
 # 인자 없이 실행
-relay
+rmsg
+```
+
+### TUI 모드
+
+```bash
+# ratatui 터미널 UI
+rmsg tui
 ```
 
 ## 명령어
 
 | 명령어 | 설명 |
 |---------|-------------|
-| `relay` | GUI 실행 |
-| `relay create` | 새 방 만들고 채팅 시작 |
-| `relay join <room-id>` | 기존 방 참여 |
-| `relay list` | 로컬 DB에서 방 목록 조회 |
-| `relay --help` | 도움말 |
-| `relay --version` | 버전 |
+| `rmsg` | GUI 실행 |
+| `rmsg tui` | TUI 실행 (ratatui) |
+| `rmsg create` | 새 방 만들고 채팅 시작 |
+| `rmsg join <room-id>` | 기존 방 참여 |
+| `rmsg list` | 로컬 DB에서 방 목록 조회 |
+| `rmsg --help` | 도움말 |
 
 ## 보안
 
@@ -88,7 +95,7 @@ relay
 ```
 ┌───────────┐    GossipSub     ┌───────────┐
 │  Alice     │◄───────────────▶│   Bob      │
-│  (relay)   │  (암호화됨)      │  (relay)   │
+│  (rmsg)   │  (암호화됨)      │  (rmsg)   │
 └─────┬─────┘                  └─────┬─────┘
       │                              │
       │    Kademlia DHT              │

@@ -1,16 +1,16 @@
 [package]
-name = "relay"
+name = "rmsg"
 version = "0.1.0"
 edition = "2021"
 authors = ["hgwk"]
 description = "Serverless P2P encrypted chat — libp2p DHT + E2E encryption, zero servers"
 license = "MIT"
 repository = "https://github.com/hgwk/rmsg"
-keywords = ["chat", "p2p", "libp2p", "e2e", "encrypted", "dht"]
+keywords = ["chat", "p2p", "libp2p", "e2e", "encrypted", "dht", "messenger"]
 categories = ["command-line-utilities", "network-programming"]
 
 [[bin]]
-name = "relay"
+name = "rmsg"
 path = "src/main.rs"
 
 [dependencies]
