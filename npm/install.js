@@ -5,10 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const NAME = 'relay';
+const NAME = 'rmsg';
 const VERSION = '0.1.0';
-const REPO = 'hgwk/relay';
-const BIN_DIR = path.join(os.homedir(), '.relay', 'bin');
+const REPO = 'hgwk/rmsg';
+const BIN_DIR = path.join(os.homedir(), '.rmsg', 'bin');
 const BIN_PATH = path.join(BIN_DIR, NAME + (os.platform() === 'win32' ? '.exe' : ''));
 
 function getPlatform() {
@@ -53,7 +53,7 @@ async function install() {
 
 function run() {
   if (!fs.existsSync(BIN_PATH)) {
-    console.error(`${NAME} binary not found. Run 'npm install -g @hgwk/relay' first.`);
+    console.error(`${NAME} binary not found. Run 'npm install -g @hgwk/rmsg' first.`);
     process.exit(1);
   }
   const args = process.argv.slice(2).map(a => JSON.stringify(a)).join(' ');

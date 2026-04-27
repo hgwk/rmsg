@@ -30,11 +30,11 @@ jobs:
       - name: Package
         run: |
           cd target/${{ matrix.target }}/release
-          tar -czf relay-v${{ github.ref_name }}-${{ matrix.target }}.tar.gz relay
+          tar -czf rmsg-v${{ github.ref_name }}-${{ matrix.target }}.tar.gz rmsg
       - uses: actions/upload-artifact@v4
         with:
-          name: relay-${{ matrix.target }}
-          path: target/${{ matrix.target }}/release/relay-v${{ github.ref_name }}-${{ matrix.target }}.tar.gz
+          name: rmsg-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/rmsg-v${{ github.ref_name }}-${{ matrix.target }}.tar.gz
 
   release:
     needs: build
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/download-artifact@v4
       - uses: softprops/action-gh-release@v2
         with:
-          files: relay-*/relay-*.tar.gz
+          files: rmsg-*/rmsg-*.tar.gz
 
   npm-publish:
     needs: release
